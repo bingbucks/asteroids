@@ -1,0 +1,108 @@
+CSE182 Spring 1993
+Homework Assignment 5   FINAL VERSION
+Due March 5, 5 PM
+
+THIS IS THE FINAL VERSION.
+I HAVE ADDED A PRIMITIVE DISPLAY ROUNTINE FOR DISPLAYING A BALL
+IT HAS NO SCALING AT ALL SO THE BALL MUST BE WITHIN THE SCREEN
+COORDINATES> I MAY CHANGE THIS ROUTINE, BUT ONLY TO SIMPLIFY
+TOUR WORK> I ALSO INCLUDE A LITTLE TEST PROGRAM THAT DEFINES A 
+BALL, WITH AN INITIAL POSITION, VELOCITY AND ACCELERATION, AND A
+BOUNDING BOX. THE BALL BOUNCES OFF THE WALLS OF THE BOX WHEN I
+RUN IT.
+  
+As usual this homework needs to demonstrated to Kang Shen, Jose
+delCano, or me. 
+
+We are beginning to develop a package that will allow us to write
+programs about objects, moving in 2-dimensional space, and
+displaying them on the screen. In this assignment we create some
+objects that should be generally useful, and we use 'inheritance'
+to allow inclusion of the methods in the 'child' objects.
+
+1. Create a definition of an object 'location' and methods for it.
+
+  type location = object
+     function x : integer;                   {return xval}
+     function y : integer;                   {return yval}
+     function r : real;                      {radial location}
+     function theta : real;               {0 <= theta < 2*pi}
+     procedure make( x1,y1:integer);        {set xval, yval}
+     procedure moves_to( l : location);   {move the location}
+     function manhattan(l : location): integer; 
+                       {number of vertical and horiz steps to l}
+     function same(l: location): boolean;  
+                          { is l in the same place?} 
+     function near(l: location; d : integer) : boolean;
+                          {is it near l, d is manhattan distance}
+     procedure distance( l : location; var z : location);
+                    {return z, the distance to l}
+     function distance_x( l : location) : integer; {x separation}
+     function distance_y( l : location) : integer; {y separation}
+     procedure moves_by( l : location);   {a relative move}
+     private
+       xval,yval : integer; {these fields not directly accessible}
+  end;
+
+2. Create an object that is basically a rectangle, and that
+    inherits all the propoerties of location. The 'location'
+    of the recatnglw is by definition the  location of the 
+    upper left corner.
+ 
+   type rect = object(location)
+      {since all the methods of location are inherited}
+      {the 'location' of the rectangle is the upper left corner}
+      function contains( l : location): boolean;{rect contains l?}
+      function overlap ( re : rect) : boolean;
+      procedure make( x1,y1,width1,height1 : integer);
+      procedure corners(var ur,lr,ll:location); {get corners}
+      function getwidth: integer;
+      function getheight: integer;
+      function above(l:location):boolean; {is rect above l?}
+      function below(l:location):boolean;
+      function right_of(l:location):boolean;
+      function left_of(l:location):boolean;
+      private
+        width, height : integer;   {only positive values allowed}
+   end;
+3. Create an object 'ball' that inherits from 'location'. In
+    addition the ball has a rectangle asociated with it, and 
+    the ball should bounce off the walls of the rectangle when 
+    it reaches a wall.
+
+   type ball = object (location)
+     display_char : char;    {I did not make it private}
+     procedure make( l,v,a : location; bx : rect );
+                     {set loc, vel, acc, and enclosing box}
+     procedure bounce_x;
+     procedure bounce_y;
+     procedure up_date;     { move to next location}
+     procedure display;
+     private
+       velocity,acceleration : location;
+       box : rect ; {this rectangle should contain the ball}
+       last: location;    {last displayed location}
+     end;
+
+   procedure ball.display;
+   begin
+     CRT.gotoxy(last.xval, last.yval); write(' '); {erasure}
+     CRT.gotoxy(xval,yval); write(display_char);
+     last.make(xval,yval)
+   end;
+
+var l1,l2,l3 : location;
+    r1 :rect;
+    b1 :ball;
+begin                                  {TEST PROGRAM}
+   r1.make(10,22,30,10);
+   l1.make(15,15); l2.make(1,1); l3.make(0,0);
+   b1.make(l1,l2,l3,r1);
+   b1.display_char := '*';
+   clrscr;
+   repeat
+     b1.up_date;
+     b1.display;
+     delay(500)
+   until CRT.keypressed;
+end.

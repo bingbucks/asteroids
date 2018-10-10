@@ -1,0 +1,324 @@
+Unit hw3tpu2; {Citasson - CSE182 - HW#3}
+
+Interface
+
+  type FRACTION=Object
+     function numerator:integer;
+     function denominator:integer;
+     procedure plus(y:fraction);
+     procedure minus(y:fraction);
+     procedure times(y:fraction);
+     procedure divided_by(y:fraction);
+     function equal_to(y:fraction):boolean;
+     function gte(y:fraction):boolean;
+     function lt(y:fraction):boolean;
+     procedure normalize;
+     procedure make(n,d:integer);
+     function real_value:real;
+     procedure read_fraction;
+     procedure readf_fraction(var fil:text);
+     procedure write_fraction;
+     procedure writef_fraction(var fil:text);
+  private
+     numer:integer;
+     denomin:integer;
+     function gcf(x,y:integer):integer;
+  end;
+
+Implementation
+
+     function FRACTION.equal_to(y:fraction):boolean;
+       begin
+       If y.denomin<>0 then
+         begin
+       If (FRACTION.real_value)=(y.real_value) then
+         equal_to:=true
+       else
+         equal_to:=false;
+         end
+       else equal_to:=false;
+       end;
+
+     function FRACTION.gte(y:fraction):boolean;
+       begin
+       If y.denomin<>0 then
+          begin
+       If (FRACTION.real_value)>(y.real_value) then
+         gte:=true
+       else
+         gte:=false;
+         end
+       else gte:=false;
+       end;
+
+     function FRACTION.lt(y:fraction):boolean;
+       begin
+       if y.denomin<>0 then
+          begin
+       If (FRACTION.real_value)<(y.real_value) then
+         lt:=true
+       else
+         lt:=false;
+          end
+       else lt:=false;
+       end;
+
+     function FRACTION.numerator:integer;
+       begin
+         numerator:=numer;
+       end;
+
+     function FRACTION.denominator:integer;
+       begin
+         denominator:=denomin;
+       end;
+
+     function FRACTION.real_value:real;
+       begin
+         if denomin=0 then
+          begin
+            writeln('UNDEFINED REAL VALUE');
+            real_value:=0
+          end
+         else
+          real_value:=numer/denomin;
+       end;
+
+     function FRACTION.Gcf (x,y:integer):integer;
+             {Gcf uses Euclid's algorithm to find the greatest common
+              divisor of a fraction}
+        var
+	  r: integer;
+	begin
+          x := abs(x);
+	  y := abs(y);
+	  if (x = 0) or (y = 0) then
+	    begin
+	      if x = 0 then
+	        Gcf := y
+	      else
+	        Gcf := x
+	    end
+	  else
+	    begin
+	      Gcf := 1;
+	        while y > 1 do
+		  begin
+		    r := x mod y;
+		    if r <> 0 then
+		      begin
+		        x := y;
+			y := r
+		      end
+		    else
+		      begin
+		        Gcf := y;
+			y := 1
+		      end;
+		  end;
+	    end;
+	end;
+
+     function Gcf_longint (x,y:longint):longint;
+             {Gcf uses Euclid's algorithm to find the greatest common
+              divisor of a fraction}
+        var
+	  r: longint;
+	begin
+          x := abs(x);
+	  y := abs(y);
+	  if (x = 0) or (y = 0) then
+	    begin
+	      if x = 0 then
+	        Gcf_longint := y
+	      else
+	        Gcf_longint := x
+	    end
+	  else
+	    begin
+	      Gcf_longint := 1;
+	        while y > 1 do
+		  begin
+		    r := x mod y;
+		    if r <> 0 then
+		      begin
+		        x := y;
+			y := r
+		      end
+		    else
+		      begin
+		        Gcf_longint := y;
+			y := 1
+		      end;
+		  end;
+	    end;
+	end;
+
+     procedure normalize_longint(var NewUpSum,NewLoSum:longint; x,y:longint);
+       var greatest:longint;
+       begin
+         If y<0 then
+           begin
+             x:=x*(-1);
+             y:=abs(y);
+           end;
+         If y=0 then y:=1;
+         greatest:=gcf_longint(x,y);
+           If greatest=0 then greatest:=1;
+         NewUpSum:=trunc(x/greatest);
+         NewLoSum:=trunc(y/greatest);
+       end;
+
+     procedure FRACTION.plus(y:fraction);
+       var UpSum,LoSum,T1,T2:longint;
+       begin
+         UpSum:=longint(numer)*longint(y.denomin)+longint(denomin)*longint(y.numer);
+         LoSum:=longint(denomin)*longint(y.denomin);
+         T1:=0;
+         T2:=0;
+
+         If LoSum<>0 then
+           normalize_longint(T1,T2,UpSum,LoSum);
+         if (abs(T1)>MAXINT) or (abs(T2)>MAXINT) then
+           begin
+             writeln('OVERFLOW!!!');
+             numer:=0;
+             denomin:=0;
+           end
+         else
+           begin
+             numer:=T1;
+             denomin:=T2;
+           end;
+       end;
+
+     procedure FRACTION.minus(y:fraction);
+       var UpSum,LoSum,T1,T2:longint;
+       begin
+         UpSum:=longint(numer)*longint(y.denomin)-longint(denomin)*longint(y.numer);
+         LoSum:=longint(denomin)*longint(y.denomin);
+         T1:=0;
+         T2:=0;
+         if LoSum<>0 then
+           normalize_longint(T1,T2,UpSum,LoSum);
+         if (abs(T1)>MAXINT) or (abs(T2)>MAXINT) then
+           begin
+             writeln('OVERFLOW!!!');
+             numer:=0;
+             denomin:=0;
+           end
+         else
+           begin
+             numer:=T1;
+             denomin:=T2;
+           end;
+       end;
+
+
+
+
+     procedure FRACTION.times(y:fraction);
+       var UpSum,LoSum,T1,T2:longint;
+       begin
+         UpSum:=longint(numer)*longint(y.numer);
+         LoSum:=longint(denomin)*longint(y.denomin);
+         T1:=0;
+         T2:=0;
+         if LoSum<>0 then
+           normalize_longint(T1,T2,UpSum,LoSum);
+         if (abs(T1)>MAXINT) or (abs(T2)>MAXINT) then
+           begin
+             writeln('OVERFLOW!!!');
+             numer:=0;
+             denomin:=0;
+           end
+         else
+           begin
+             numer:=T1;
+             denomin:=T2;
+           end;
+       end;
+
+
+
+
+     procedure FRACTION.divided_by(y:fraction);
+       var UpSum,LoSum,T1,T2:longint;
+       begin
+         UpSum:=longint(numer)*longint(y.denomin);
+         LoSum:=longint(denomin)*longint(y.numer);
+         T1:=0;
+         T2:=0;
+         if LoSum<>0 then
+           normalize_longint(T1,T2,UpSum,LoSum);
+         if (abs(T1)>MAXINT) or (abs(T2)>MAXINT) then
+           begin
+             writeln('OVERFLOW!!!');
+             numer:=0;
+             denomin:=0;
+           end
+         else
+           begin
+             numer:=T1;
+             denomin:=T2;
+             if denomin=0 then writeln('THIS FRACTION IS UNDEFINED!!!');
+           end;
+       end;
+
+
+
+     procedure FRACTION.normalize;
+       var greatest:integer;
+       begin
+         If denomin<0 then
+           begin
+             numer:=numer*(-1);
+             denomin:=abs(denomin);
+           end;
+         If denomin=0 then denomin:=1;
+         greatest:=FRACTION.gcf(numer,denomin);
+           If greatest=0 then greatest:=1;
+         numer:=trunc(numer/greatest);
+         denomin:=trunc(denomin/greatest);
+       end;
+
+     procedure FRACTION.make(n,d:integer);
+       begin
+        numer:=n;
+        denomin:=d;
+       end;
+
+     procedure FRACTION.read_fraction;
+       var ch:char;
+           KeyNum,KeyDen:integer;
+       begin
+         KeyDen:=0;
+           while KeyDen=0 do
+             begin
+               read(KeyNum);
+               read(ch);
+               read(ch);
+               read(ch);
+               readln(KeyDen);
+               If KeyDen=0 then
+                 begin
+                   writeln('Again, no zeros in the denominator! ');
+                 end;
+             end;
+
+           FRACTION.make(KeyNum,KeyDen);
+           FRACTION.normalize;
+       end;
+
+     procedure FRACTION.readf_fraction(var fil:text);
+         begin
+          repeat
+           readln(fil,numerööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööööl:text);
+         begin
+           writeln(fil,FRACTION.numerator);
+           writeln(fil,FRACTION.denominator);
+           close(fil);
+         end;
+
+begin
+end.

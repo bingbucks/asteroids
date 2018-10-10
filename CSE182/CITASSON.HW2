@@ -1,0 +1,109 @@
+program FractionUnitUser; {Citasson - HW#2 - CSE182}
+
+uses Fractpt3,CRT;
+
+var
+   F1, F2, F3, F4, FinalFraction: fraction;
+   v: real;
+   filein,fileout:text;
+   name:string[8];
+   n,d:integer;
+
+begin {FractionUnitUser}
+        CRT.TextBackground(CRT.Blue);  {Changes the background color}
+        CRT.ClrScr;                    {Clears the screen}
+        CRT.Textcolor(CRT.Red);        {Changes the text color}
+
+        writeln('Enter a file name: ');
+        read(name);
+
+        assign(fileout,name);        {Assigns the name you specify to fileout}
+        rewrite(fileout);
+
+        writeln('Enter a number in the form --> (N / D): ');
+	Read_Fraction(Finalfraction);
+
+        assign(filein,'infile');
+        reset(filein);
+        Readf_fraction(filein,F4);   {Reads fraction from file and performs
+                                     the procedures below with the fraction
+                                     it just read and the one the user enters}
+        CRT.Textcolor(CRT.Green+Blink);
+        Multiply(F3,Finalfraction,F4);
+        writeln(fileout,'MULTIPLICATION: ');
+        Writef_fraction(fileout,F3); {Writes the result to a text file}
+        writeln('MULTIPLICATION: ');
+        Write_fraction(F3);          {Writes the result to the screen}
+        Fraction2real(v,F3);         {Turns fraction into a real}
+        writeln(v);                  {Writes the real value to the screen}
+        writeln(fileout,v);          {Writes the real value to a text file}
+          {The two writeln above this line are just to show that
+           fraction2real works}
+        writeln(fileout);            {Writes a blank line to fileout}
+
+        CRT.Textcolor(CRT.Yellow+Blink);
+        Add(F3,Finalfraction,F4);
+        writeln(fileout,'ADDITION :');
+        Writef_fraction(fileout,F3); {Writes the result to a text file}
+        writeln;
+        writeln('ADDITION: ');
+        Write_fraction(F3);          {Writes the result to the screen}
+        Fraction2real(v,F3);         {Turns fraction into a real}
+        writeln(v);                 {Writes the real value to the screen}
+        writeln(fileout,v);         {Writes the real value to a text file}
+          {The two writeln above this line are just to show that
+           fraction2real works}
+        writeln(fileout);
+
+        CRT.Delay(5000);            {Simple page break}
+
+        CRT.Textcolor(CRT.LightBlue+Blink);
+        Subtract(F3,Finalfraction,F4);
+        writeln(fileout,'SUBTRACTION: ');
+        Writef_fraction(fileout,F3); {Writes the result to a text file}
+        writeln;
+        writeln('SUBTRACTION: ');
+        Write_fraction(F3);          {Writes the result to the screen}
+        Fraction2real(v,F3);         {Turns fraction into a real}
+        writeln(v);                 {Writes the real value to the screen}
+        writeln(fileout,v);         {Writes the real value to a text file}
+          {The two writeln above this line are just to show that
+           fraction2real works}
+        writeln(fileout);
+
+        CRT.Textcolor(CRT.Magenta+Blink);
+        Divide(F3,Finalfraction,F4);
+        writeln(fileout,'DIVISION: ');
+        Writef_fraction(fileout,F3); {Writes the result to a text file}
+        writeln;
+        writeln('DIVISION: ');
+        Write_fraction(F3);          {Writes the result to the screen}
+        Fraction2real(v,F3);         {Turns fraction into a real}
+        writeln(v);                 {Writes the real value to the screen}
+        writeln(fileout,v);         {Writes the real value to a text file}
+          {The two writeln's above this line are just to show that
+           fraction2real works}
+
+        CRT.Textcolor(CRT.Yellow);
+        write('THE TWO FRACTIONS ARE EQUAL: ');
+        writeln(equal(Finalfraction,F4));       {Writes the boolean expressions}
+
+        CRT.Textcolor(CRT.LightBlue);
+        write('THE FRACTION YOU ENTERED IS < THE FRACTION READ FROM THE TEXT FILE: ');
+        writeln(lt(Finalfraction,F4));          {for all three functions to the screen}
+
+        CRT.Textcolor(CRT.Red);
+        write('THE FRACTION YOU ENTERED IS > THE FRACTION READ FROM THE TEXT FILE: ');
+        writeln(gte(Finalfraction,F4));         {ONLY to demonstrate that they do work}
+
+
+        write(fileout,'THE TWO FRACTIONS ARE EQUAL: ');
+        writeln(fileout,equal(Finalfraction,F4)); {Writes the boolean expression to fileout}
+        write(fileout,'THE FRACTION YOU ENTERED IS < THE FRACTION READ FROM THE TEXT FILE: ');
+        writeln(fileout,lt(Finalfraction,F4));    {Writes the boolean expression to fileout}
+        write(fileout,'THE FRACTION YOU ENTERED IS > THE FRACTION READ FROM THE TEXT FILE: ');
+        writeln(fileout,gte(Finalfraction,F4));   {Writes the boolean expression to fileout}
+
+        close(fileout);             {Closes fileout}
+        CRT.Delay(10000);
+End.{FractionUnitUser}
